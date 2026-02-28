@@ -1,0 +1,91 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum Role {
+  USER
+  ADMIN
+}
+
+enum SeatStatus {
+  AVAILABLE
+  LOCKED
+  SOLD
+}
+
+enum ReservationStatus {
+  PENDING
+  SUCCESS
+  CANCELLED
+  EXPIRED
+}
+
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  password  String
+  name      String
+  role      Role     @default(USER)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  reservations Reservation[]
+
+  @@map("users")
+}
+
+model Event {
+  id          String   @id @default(uuid())
+  title       String
+  description String?
+  showTime    DateTime
+  venue       String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  seats Seat[]
+
+  @@map("events")
+}
+
+model Seat {
+  id         String     @id @default(uuid())
+  seatNumber String
+  status     SeatStatus @default(AVAILABLE)
+  price      Decimal    @db.Decimal(10, 2)
+  eventId    String
+
+  event Event @relation(fields: [eventId], references: [id], onDelete: Cascade)
+
+  reservations Reservation[]
+
+  @@unique([eventId, seatNumber])
+  @@map("seats")
+}
+
+model Reservation {
+  id          String            @id @default(uuid())
+  userId      String
+  seatId      String
+  status      ReservationStatus @default(PENDING)
+  totalAmount Decimal           @db.Decimal(10, 2)
+  bookingTime DateTime          @default(now())
+  expiiredAt  DateTime
+  paymentId   String?
+
+  user User @relation(fields: [userId], references: [id])
+  seat Seat @relation(fields: [seatId], references: [id])
+
+  @@map("reservations")
+}

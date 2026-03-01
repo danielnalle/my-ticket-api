@@ -27,4 +27,30 @@ export class UserController {
       });
     }
   }
+
+  static async login(req: Request, res: Response) {
+    try {
+      const { email, password } = req.body;
+
+      if (!email || !password) {
+        return res.status(400).json({
+          status: "error",
+          message: "Email dan password wajib diisi!",
+        });
+      }
+
+      const result = await UserService.loginUser({ email, password });
+
+      return res.status(200).json({
+        status: "success",
+        message: "Login berhasil!",
+        data: result,
+      });
+    } catch (error: any) {
+      return res.status(401).json({
+        status: "error",
+        message: error.message || "Autentikasi gagal",
+      });
+    }
+  }
 }

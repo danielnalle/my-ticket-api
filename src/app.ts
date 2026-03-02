@@ -2,6 +2,7 @@ import "dotenv/config";
 import express, { type Request, type Response } from "express";
 import cors from "cors";
 import userRoutes from "./routes/user.route.js";
+import eventRoutes from "./routes/event.route.js";
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -12,6 +13,7 @@ app.use(express.json());
 
 // Main routes registration
 app.use("/api/users", userRoutes);
+app.use("/api/events", eventRoutes);
 
 // Endpoint Health Check
 app.get("/api/health", (req: Request, res: Response) => {

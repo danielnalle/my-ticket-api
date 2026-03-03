@@ -1,8 +1,10 @@
 import "dotenv/config";
 import express, { type Request, type Response } from "express";
 import cors from "cors";
+import { connectRedis } from "./config/redis.js";
 import userRoutes from "./routes/user.route.js";
 import eventRoutes from "./routes/event.route.js";
+import reservationRoutes from "./routes/reservation.route.js";
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -14,6 +16,7 @@ app.use(express.json());
 // Main routes registration
 app.use("/api/users", userRoutes);
 app.use("/api/events", eventRoutes);
+app.use("/api/reservations", reservationRoutes);
 
 // Endpoint Health Check
 app.get("/api/health", (req: Request, res: Response) => {
@@ -25,6 +28,10 @@ app.get("/api/health", (req: Request, res: Response) => {
 });
 
 // Running server
-app.listen(PORT, () => {
-  console.log(`🚀 Server is running on http://localhost:${PORT}`);
-});
+connectRedis()
+  .then(() => {
+    app.listen(PORT, () => {
+      console.log(`🚀 Server is running on http://localhost:${PORT}`);
+    });
+  })
+  .catch(console.error);

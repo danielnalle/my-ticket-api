@@ -9,7 +9,7 @@ export class ReservationService {
 
     const numberOfReservations =
       await ReservationRepository.countUserResevations(userId);
-    if (numberOfReservations > 4)
+    if (numberOfReservations >= 4)
       throw new Error("Maksimal pembelian 4 tiket per akun");
 
     const lockKey = `seat_lock:${seatId}`;

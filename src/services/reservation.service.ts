@@ -1,5 +1,6 @@
 import { ReservationRepository } from "../repositories/reservation.repository.js";
 import { redisClient } from "../config/redis.js";
+import { addExpirationJob } from "../jobs/reservation.queue.js";
 
 export class ReservationService {
   static async bookSeat(userId: string, seatId: string) {
@@ -35,6 +36,9 @@ export class ReservationService {
         Number(seat.price),
         expiredAt,
       );
+
+      const delayMs = lockDurationSeconds * 1000;
+      await addExpirationJob(result.reservation.id, seatId, delayMs);
 
       return result.reservation;
     } catch (error) {

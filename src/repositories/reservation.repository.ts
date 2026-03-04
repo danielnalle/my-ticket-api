@@ -67,4 +67,28 @@ export class ReservationRepository {
       return { updatedReservation, updatedSeat };
     });
   }
+
+  static async cancelUnpaidReservation(reservationId: string, seatId: string) {
+    return await prisma.$transaction(async (tx) => {
+      const reservation = await tx.reservation.findUnique({
+        where: { id: reservationId },
+      });
+
+      if (!reservation || reservation.status !== "PENDING") {
+        return null;
+      }
+
+      const updatedReservation = await tx.reservation.update({
+        where: { id: reservationId },
+        data: { status: "EXPIRED" },
+      });
+
+      const updatedSeat = await tx.seat.update({
+        where: { id: seatId },
+        data: { status: "AVAILABLE" },
+      });
+
+      return { updatedReservation, updatedSeat };
+    });
+  }
 }

@@ -6,6 +6,7 @@ import userRoutes from "./routes/user.route.js";
 import eventRoutes from "./routes/event.route.js";
 import reservationRoutes from "./routes/reservation.route.js";
 import webhookRoutes from "./routes/webhook.route.js";
+import "./jobs/reservation.worker.js";
 
 const app = express();
 const PORT = process.env.PORT || 3000;

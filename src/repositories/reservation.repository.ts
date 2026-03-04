@@ -36,4 +36,35 @@ export class ReservationRepository {
       where: { userId, OR: [{ status: "PENDING" }, { status: "SUCCESS" }] },
     });
   }
+
+  static async findReservationById(reservationId: string) {
+    return await prisma.reservation.findUnique({
+      where: { id: reservationId },
+    });
+  }
+
+  static async confirmPayment(
+    reservationId: string,
+    seatId: string,
+    paymentId: string,
+  ) {
+    return await prisma.$transaction(async (tx) => {
+      const updatedReservation = await tx.reservation.update({
+        where: { id: reservationId },
+        data: {
+          status: "SUCCESS",
+          paymentId: paymentId,
+        },
+      });
+
+      const updatedSeat = await tx.seat.update({
+        where: { id: seatId },
+        data: {
+          status: "SOLD",
+        },
+      });
+
+      return { updatedReservation, updatedSeat };
+    });
+  }
 }

@@ -5,6 +5,7 @@ import { connectRedis } from "./config/redis.js";
 import userRoutes from "./routes/user.route.js";
 import eventRoutes from "./routes/event.route.js";
 import reservationRoutes from "./routes/reservation.route.js";
+import webhookRoutes from "./routes/webhook.route.js";
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -17,6 +18,7 @@ app.use(express.json());
 app.use("/api/users", userRoutes);
 app.use("/api/events", eventRoutes);
 app.use("/api/reservations", reservationRoutes);
+app.use("/api/webhooks", webhookRoutes);
 
 // Endpoint Health Check
 app.get("/api/health", (req: Request, res: Response) => {
